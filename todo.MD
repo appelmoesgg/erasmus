@@ -16,8 +16,6 @@ You die if:
 
 You touch a car
 
-You stay too long in the same place
-
 The scoreboard shows:
 
 ⏱️ Time score
