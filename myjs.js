@@ -1,13 +1,19 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+let width = window.innerWidth;
+let height = window.innerHeight;
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
 // Punkte
 let score = 0;
 
 // Huhn
 let chicken = {
-  x: 180,
-  y: 450,
+  x: 800,
+  y: 500,
   size: 30,
   step: 0
 };
@@ -29,17 +35,17 @@ let coin = {
 };
 
 function resetGame() {
-  chicken.x = 180;
-  chicken.y = 450;
+  chicken.x = 800;
+  chicken.y = 500;
   car.x = -60;
   score = 0;
 }
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowUp") chicken.y -= 20;
-  if (e.key === "ArrowDown") chicken.y += 20;
-  if (e.key === "ArrowLeft") chicken.x -= 20;
-  if (e.key === "ArrowRight") chicken.x += 20;
+  if (e.key === "ArrowUp") chicken.y -= 50;
+  if (e.key === "ArrowDown") chicken.y += 50;
+  if (e.key === "ArrowLeft") chicken.x -= 50;
+  if (e.key === "ArrowRight") chicken.x += 50;
 });
 
 function collisionRect(a, b) {
@@ -65,7 +71,8 @@ function update() {
   if (car.x > canvas.width) car.x = -60;
 
   if (collisionRect(chicken, car)) {
-    alert("Huhn getroffen!");
+    let popup = document.getElementById("GameClosedPopUp");
+    
     resetGame();
   }
 
