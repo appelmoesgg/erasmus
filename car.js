@@ -1,10 +1,10 @@
 export class Car{
-    constructor(x, y, direction, speed) {
+    constructor(x, y, direction, speed, width, height) {
         this.direction = direction
         this.speed = speed
 
-        this.width = 60
-        this.height = 30
+        this.width = width
+        this.height = height
 
         this.x = x
         this.y = y

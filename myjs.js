@@ -1,18 +1,18 @@
-import Car from "./car.js"
+import Car from "./car.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 let isGameOverPopupVisible = false;
-
 
 // Punkte
 let score = 0;
 
 // Huhn
 let chicken = {
-  x: canvas.width/2,
-  y: canvas.height/2,
-  size: 30,
+  x: canvas.width / 2 - 100, 
+  y: canvas.height / 2 - 95, 
+  width: 200,
+  height: 190,
   step: 0
 };
 
@@ -22,15 +22,22 @@ let defaultCar = {
   y: 250,
   width: 60,
   height: 30,
-  speed: 3
+  speed: 3,
 };
 
 // Münze
 let coin = {
   x: Math.random() * 360,
   y: 230,
-  size: 20
+  size: 20,
 };
+
+const horizontalLanes = [230, 830];
+const verticalLanes = [
+  canvas.width / 8 + 100,
+  canvas.width / 2 + 100,
+  canvas.width - canvas.width / 8 + 50,
+];
 
 function resetGame() {
   chicken.x = 180;
@@ -39,55 +46,55 @@ function resetGame() {
   score = 0;
 }
 
-let popupShown = false
+let popupShown = false;
 
-function handleMove(direction){
-  const moves = ["Up", "Down","Left","Right"]
-  const num = moves.indexOf(direction)
+function handleMove(direction) {
+  const moves = ["Up", "Down", "Left", "Right"];
+  const num = moves.indexOf(direction);
 
-  switch (num){
+  switch (num) {
     case 0:
-      console.log("up")
-      if (chicken.y - 20 > 0){
+      console.log("up");
+      if (chicken.y - 20 > 0) {
         chicken.y -= 20;
       }
       break;
     case 1:
-      console.log("down")
-      if (chicken.y + 20 < canvas.height){
+      console.log("down");
+      if (chicken.y + 20 < canvas.height) {
         chicken.y += 20;
       }
       break;
     case 2:
-      console.log("left")
-      if (chicken.x - 20 > 0){
+      console.log("left");
+      if (chicken.x - 20 > 0) {
         chicken.x -= 20;
       }
       break;
     case 3:
-      console.log("right")
-      if (chicken.x + 20 < canvas.width){
+      console.log("right");
+      if (chicken.x + 20 < canvas.width) {
         chicken.x += 20;
       }
       break;
     default:
-      console.log("Not a valid move direction")
+      console.log("Not a valid move direction");
   }
 }
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowUp") handleMove("Up");
-  if (e.key === "ArrowDown") handleMove("Down")
-  if (e.key === "ArrowLeft") handleMove("Left")
-  if (e.key === "ArrowRight") handleMove("Right")
+  if (e.key === "ArrowDown") handleMove("Down");
+  if (e.key === "ArrowLeft") handleMove("Left");
+  if (e.key === "ArrowRight") handleMove("Right");
 });
 
 function collisionRect(a, b) {
   return (
     a.x < b.x + b.width &&
-    a.x + a.size > b.x &&
+    a.x + a.width > b.x &&
     a.y < b.y + b.height &&
-    a.y + a.size > b.y
+    a.y + a.height > b.y
   );
 }
 
@@ -102,7 +109,7 @@ function collisionCircleRect(circle, car) {
 
 function showGameOverPopup() {
   popupShown = true;
-  const popup = document.getElementById('GameClosedPopUp');
+  const popup = document.getElementById("GameClosedPopUp");
   popup.style.position = "fixed";
   popup.style.top = "0";
   popup.style.left = "0";
@@ -129,7 +136,7 @@ function showGameOverPopup() {
 
   button.addEventListener("click", () => {
     popup.replaceChildren();
-    popup.style.display = "none"; 
+    popup.style.display = "none";
     isGameOverPopupVisible = false;
     popupShown = false;
     resetGame();
@@ -141,69 +148,111 @@ function showGameOverPopup() {
   isGameOverPopupVisible = true;
 }
 
-
-
 function update() {
-  for (let car of cars){
-    switch (car.direction){
+  if (Math.random() < 0.01) {
+    const speed = Math.random() * 2 + 1;
+
+    const side = Math.floor(Math.random() * 4);
+
+    switch (side) {
+      case 0: // left → right
+        spawnCar(
+          "Right",
+          horizontalLanes[Math.floor(Math.random() * horizontalLanes.length)],
+          speed,
+          60,
+          30
+        );
+        break;
+
+      case 1: // right → left
+        spawnCar(
+          "Left",
+          horizontalLanes[Math.floor(Math.random() * horizontalLanes.length)],
+          speed,
+          60,
+          30
+        );
+        break;
+
+      case 2: // top → down
+        spawnCar(
+          "Down",
+          verticalLanes[Math.floor(Math.random() * verticalLanes.length)],
+          speed,
+          30,
+          60
+        );
+        break;
+
+      case 3: // bottom → up
+        spawnCar(
+          "Up",
+          verticalLanes[Math.floor(Math.random() * verticalLanes.length)],
+          speed,
+          30,
+          60
+        );
+        break;
+    }
+  }
+
+  for (let car of cars) {
+    switch (car.direction) {
       case "Up":
-        car.y -= car.speed
+        car.y -= car.speed;
         if (car.y < 0) car.y = canvas.height;
-        break
+        break;
       case "Down":
-        car.y += car.speed
+        car.y += car.speed;
         if (car.y > canvas.height) car.y = canvas.height + 60;
-        break
+        break;
       case "Right":
-        car.x += car.speed
+        car.x += car.speed;
         if (car.x > canvas.width) car.x = -60;
-        break
+        break;
       case "Left":
-        car.x -= car.speed
+        car.x -= car.speed;
         if (car.x < 0) car.x = canvas.width + 60;
-        break
+        break;
       default:
         break;
     }
   }
-  
+
   defaultCar.x += defaultCar.speed;
   if (defaultCar.x > canvas.width) defaultCar.x = -60;
 
   if (collisionRect(chicken, defaultCar)) {
-    if(isGameOverPopupVisible === false)
-    {
+    if (isGameOverPopupVisible === false) {
       showGameOverPopup();
     }
   }
 
-  for (let car of cars){
+  for (let car of cars) {
     if (collisionRect(chicken, car)) {
-    if(isGameOverPopupVisible === false)
-    {
-      showGameOverPopup();
+      if (isGameOverPopupVisible === false) {
+        showGameOverPopup();
+      }
     }
   }
-  }
 
- 
-  if (collisionCircleRect(chicken, {
-    x: coin.x,
-    y: coin.y,
-    width: coin.size,
-    height: coin.size
-  })) {
+  if (
+    collisionCircleRect(chicken, {
+      x: coin.x,
+      y: coin.y,
+      width: coin.size,
+      height: coin.size,
+    })
+  ) {
     score++;
-    coin.x = Math.random() * 360;
-    coin.y = 220 + Math.random() * 60;
+    coin.x = Math.random() * canvas.width;
+    coin.y = 220 + Math.random() * canvas.height;
   }
 
-  
-  if (chicken.y < 0) {   
-
+  if (chicken.y < 0) {
     resetGame();
   }
-
 
   chicken.step += 0.1;
 }
@@ -215,9 +264,9 @@ function draw() {
   ctx.fillStyle = "#333";
   ctx.fillRect(0, 200, canvas.width, 100); // horizont high
   ctx.fillRect(0, 800, canvas.width, 100); // horizont low
-  ctx.fillRect(canvas.width/8 + 50, 0, 100, canvas.height); // vert right
-  ctx.fillRect(canvas.width/2 + 50, 0, 100, canvas.height); // vert mid
-  ctx.fillRect(canvas.width - canvas.width/8, 0, 100, canvas.height); // vert right
+  ctx.fillRect(canvas.width / 8 + 50, 0, 100, canvas.height); // vert right
+  ctx.fillRect(canvas.width / 2 + 50, 0, 100, canvas.height); // vert mid
+  ctx.fillRect(canvas.width - canvas.width / 8, 0, 100, canvas.height); // vert right
 
   // Münze
   ctx.fillStyle = "gold";
@@ -227,24 +276,26 @@ function draw() {
     coin.y + coin.size / 2,
     coin.size / 2,
     0,
-    Math.PI * 2
+    Math.PI * 2,
   );
   ctx.fill();
 
-  
   let wobble = Math.sin(chicken.step) * 3;
 
   // Huhn
   ctx.fillStyle = "yellow";
-  ctx.fillRect(
-    chicken.x + wobble,
-    chicken.y,
-    chicken.size,
-    chicken.size
+  ctx.fillRect(chicken.x + wobble, chicken.y, chicken.size, chicken.size);
+
+  ctx.drawImage(
+   document.getElementById("chicken"),
+  chicken.x + wobble,
+  chicken.y,
+  chicken.width ,
+  chicken.height
   );
 
   // Auto
-  for (let car of cars){
+  for (let car of cars) {
     ctx.fillStyle = "red";
     ctx.fillRect(car.x, car.y, car.width, car.height);
   }
@@ -258,21 +309,50 @@ function draw() {
   ctx.fillText("Test: " + score, 10, 30);
 }
 
+function spawnCar(direction, yOrX, speed, width, height) {
+  let x, y;
+
+  switch (
+    direction // "goes to"
+  ) {
+    case "Right":
+      x = -60;
+      y = yOrX;
+      break;
+
+    case "Left":
+      x = canvas.width + 60;
+      y = yOrX;
+      break;
+
+    case "Down":
+      x = yOrX;
+      y = -60;
+      break;
+
+    case "Up":
+      x = yOrX;
+      y = canvas.height + 60;
+      break;
+  }
+
+  cars.push(new Car(x, y, direction, speed, width, height));
+}
+
 function gameLoop() {
-  if (!popupShown ) {
+  if (!popupShown) {
     update();
     draw();
   }
   requestAnimationFrame(gameLoop);
 }
 
-
-let cars = []
-let testy = 60
+let cars = [];
+/*let testy = 60
 let testspeed = 1
 for (let i = 0; i < 9; i++){
-  cars.push(new Car(100, testy, "Up", testspeed))
+  cars.push(new Car(100, testy, "Right", testspeed))
   testspeed++
   testy += 100
-}
+}*/
 gameLoop();
