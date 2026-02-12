@@ -100,7 +100,7 @@ function handleMove(direction) {
       break;
   }
 
-  WRAP_OFFSET = 10
+  const WRAP_OFFSET = 10
   if (chicken.x + chicken.width < 0) {
   chicken.x = canvas.width - chicken.width - WRAP_OFFSET; // slightly inside right
 } else if (chicken.x > canvas.width) {
