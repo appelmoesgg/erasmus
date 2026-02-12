@@ -100,19 +100,15 @@ function handleMove(direction) {
       break;
   }
 
-  const WRAP_OFFSET = 10
-  if (chicken.x + chicken.width < 0) {
-  chicken.x = canvas.width - chicken.width - WRAP_OFFSET; // slightly inside right
-} else if (chicken.x > canvas.width) {
-  chicken.x = WRAP_OFFSET; // slightly inside left
-}
-
-// Vertical wrap
-if (chicken.y + chicken.height < 0) {
-  chicken.y = canvas.height - chicken.height - WRAP_OFFSET; // slightly inside bottom
-} else if (chicken.y > canvas.height) {
-  chicken.y = WRAP_OFFSET; // slightly inside top
-}
+  if (chicken.x < 0){
+    newX = canvas.width - chicken.width
+  } else if (chicken.x + chicken.width > canvas.width){
+    newX = 0 + chicken.width
+  } else if (chicken.y < 0){
+    newY = canvas.height - chicken.height
+  } else if (chicken.y + chicken.height > canvas.height){
+    newY = chicken.height
+  }
 
   let hitsHouse = houses.some((house) =>
     collisionRect(
@@ -357,16 +353,16 @@ function draw() {
 
     switch (car.direction) {
       case "Right":
-        ctx.rotate(0);
-        break;
-      case "Left":
         ctx.rotate(Math.PI);
         break;
+      case "Left":
+        ctx.rotate(0);
+        break;
       case "Up":
-        ctx.rotate(-Math.PI / 2);
+        ctx.rotate(Math.PI / 2);
         break;
       case "Down":
-        ctx.rotate(Math.PI / 2);
+        ctx.rotate(-Math.PI / 2);
         break;
     }
 
@@ -457,11 +453,5 @@ function gameLoop() {
 }
 
 let cars = [];
-/*let testy = 60
-let testspeed = 1
-for (let i = 0; i < 9; i++){
-  cars.push(new Car(100, testy, "Right", testspeed))
-  testspeed++
-  testy += 100
-}*/
+
 gameLoop();
