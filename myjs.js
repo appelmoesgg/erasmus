@@ -8,8 +8,8 @@ const tripMode = confirm("Enable high mode (advanced)?");
 let hue = 0;
 
 let houses = [
-  { x: 450, y: canvas.height / 2 - 250, width: 450, height: 450 },
-  { x: 1150, y: canvas.height / 2 - 250, width: 450, height: 450 },
+  { x: 450, y: canvas.height / 2 - 250, width: 400, height: 450 },
+  { x: 1150, y: canvas.height / 2 - 250, width: 400, height: 450 },
 ];
 let score = 0;
 
@@ -21,13 +21,6 @@ let chicken = {
   step: 0,
 };
 
-let defaultCar = {
-  x: -60,
-  y: 250,
-  width: 60,
-  height: 30,
-  speed: 3,
-};
 
 // Münze
 let coin = {
@@ -50,7 +43,6 @@ function getRandomInt(max) {
 function resetGame() {
   chicken.x = canvas.width / 8 - 100;
   chicken.y = canvas.height / 2 + 95;
-  defaultCar.x = -60;
   score = 0;
   cars = [];
 }
@@ -162,7 +154,7 @@ function showGameOverPopup() {
   popupdiv.style.textAlign = "center";
 
   const text = document.createElement("p");
-  text.textContent = "Game Over! Play again?";
+  text.textContent = `Score: ${score}  \n Game Over! Play again?`;
   text.style.fontSize = "100px";
 
   const button = document.createElement("button");
@@ -259,14 +251,7 @@ function update() {
     }
   }
 
-  defaultCar.x += defaultCar.speed;
-  if (defaultCar.x > canvas.width) defaultCar.x = -60;
 
-  if (collisionRect(chicken, defaultCar)) {
-    if (isGameOverPopupVisible === false) {
-      showGameOverPopup();
-    }
-  }
 
   for (let car of cars) {
     if (collisionRect(chicken, car)) {
@@ -384,7 +369,7 @@ function draw() {
   }
 
   ctx.fillStyle = "red";
-  ctx.fillRect(defaultCar.x, defaultCar.y, defaultCar.width, defaultCar.height);
+
 
   // Münze
   ctx.fillStyle = "gold";
