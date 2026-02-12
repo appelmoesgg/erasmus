@@ -99,15 +99,6 @@ function collisionRect(a, b) {
   );
 }
 
-function collisionCircleRect(chicken, circle) {
-  return (
-    circle.x < chicken.x + chicken.width &&
-    circle.x + circle.size > chicken.x &&
-    circle.y < chicken.y + chicken.height &&
-    circle.y + circle.size > chicken.y
-  );
-}
-
 function showGameOverPopup() {
   popupShown = true;
   const popup = document.getElementById("GameClosedPopUp");
