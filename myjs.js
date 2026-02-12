@@ -309,12 +309,12 @@ function draw() {
   ctx.fillRect(canvas.width / 2 + 50, 0, 100, canvas.height); // vert mid
   ctx.fillRect(canvas.width - canvas.width / 8, 0, 100, canvas.height); // vert right
 
-  let trees = [
-    { x: 400, y: 10 },
-    { x: 70, y: 500 },
-    { x: 800, y: 0 },
-    { x: 1300, y: 10 },
-  ];
+ let trees = [
+  { x: 400, y: 10, width: 200, height: 200 },
+  { x: 70, y: 500, width: 200, height: 200 },
+  { x: 800, y: 0, width: 200, height: 200 },
+  { x: 1300, y: 10, width: 200, height: 200 },
+];
 
   for (const tree of trees) {
     ctx.drawImage(document.getElementById("tree"), tree.x, tree.y, 200, 200);
@@ -333,6 +333,18 @@ function draw() {
     chicken.width,
     chicken.height,
   );
+
+  for (const tree of trees) {
+    let chickenUnderTree =
+        chicken.x + chicken.width > tree.x &&
+        chicken.x < tree.x + tree.width &&
+        chicken.y + chicken.height > tree.y &&
+        chicken.y < tree.y + tree.height;
+
+    ctx.globalAlpha = chickenUnderTree ? 0.3 : 1;
+    ctx.drawImage(document.getElementById("tree"), tree.x, tree.y, tree.width, tree.height);
+    ctx.globalAlpha = 1; 
+}
 
   // Auto
   for (let car of cars) {
