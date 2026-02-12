@@ -4,19 +4,23 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 let isGameOverPopupVisible = false;
 
-// Punkte
+const tripMode = confirm("Enable high mode (advanced)?");
+let hue = 0;
+
+let houses = [
+  { x: 450, y: canvas.height / 2 - 250, width: 450, height: 450 },
+  { x: 1150, y: canvas.height / 2 - 250, width: 450, height: 450 },
+];
 let score = 0;
 
-// Huhn
 let chicken = {
-  x: canvas.width / 2 - 50, 
-  y: canvas.height / 2 - 47.5, 
+  x: canvas.width / 8 - 50,
+  y: canvas.height / 2 + 47.5,
   width: 100,
   height: 95,
-  step: 0
+  step: 0,
 };
 
-// Auto
 let defaultCar = {
   x: -60,
   y: 250,
@@ -39,47 +43,85 @@ const verticalLanes = [
   canvas.width - canvas.width / 8 + 50,
 ];
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
 function resetGame() {
-  chicken.x = canvas.width / 2 - 100;
-  chicken.y = canvas.height / 2 - 95;
+  chicken.x = canvas.width / 8 - 100;
+  chicken.y = canvas.height / 2 + 95;
   defaultCar.x = -60;
   score = 0;
-  cars = []
+  cars = [];
 }
 
 let popupShown = false;
 
-function getNewCoinPos(){ //todo randomisation (on road)
-  return {x: 500, y: 500}
+function getNewCoinPos() {
+  let coinPosValid = false;
+  let x, y;
+
+  while (!coinPosValid) {
+    x = Math.random() * canvas.width;
+    y = Math.random() * canvas.height;
+
+    const inHorizontalLane =
+      (y > 230 && y < 330 - coin.size) || (y > 830 && y < 930 - coin.size);
+
+    const inVerticalLane =
+      (x > verticalLanes[0] && x < verticalLanes[0] + 100 - coin.size) ||
+      (x > verticalLanes[1] && x < verticalLanes[1] + 100 - coin.size) ||
+      (x > verticalLanes[2] && x < verticalLanes[2] + 100 - coin.size);
+
+    if (inHorizontalLane || inVerticalLane) {
+      coinPosValid = true;
+    }
+  }
+
+  return { x: x, y: y };
 }
 
 function handleMove(direction) {
-  const moves = ["Up", "Down", "Left", "Right"];
-  const num = moves.indexOf(direction);
+  let newX = chicken.x;
+  let newY = chicken.y;
 
-  switch (num) {
-    case 0:
-      if (chicken.y - 20 > 0) {
-        chicken.y -= 20;
-      }
+  switch (direction) {
+    case "Up":
+      newY -= 20;
       break;
-    case 1:
-      if (chicken.y + 20 < canvas.height) {
-        chicken.y += 20;
-      }
+    case "Down":
+      newY += 20;
       break;
-    case 2:
-      if (chicken.x - 20 > 0) {
-        chicken.x -= 20;
-      }
+    case "Left":
+      newX -= 20;
       break;
-    case 3:
-      if (chicken.x + 20 < canvas.width) {
-        chicken.x += 20;
-      }
+    case "Right":
+      newX += 20;
       break;
-    default:
-      console.log("Not a valid move direction");
+  }
+
+  if (newX + chicken.width < 0 + chicken.width) {
+    newX = canvas.width - chicken.width + 10;
+  } else if (newX > canvas.width - chicken.width) {
+    newX = -chicken.width + 10;
+  }
+
+  if (newY + chicken.height < 0) {
+    newY = canvas.height - chicken.height;
+  } else if (newY > canvas.height) {
+    newY = -chicken.height - 10;
+  }
+
+  let hitsHouse = houses.some((house) =>
+    collisionRect(
+      { x: newX, y: newY, width: chicken.width, height: chicken.height },
+      house,
+    ),
+  );
+
+  if (!hitsHouse) {
+    chicken.x = newX;
+    chicken.y = newY;
   }
 }
 
@@ -119,12 +161,15 @@ function showGameOverPopup() {
 
   const text = document.createElement("p");
   text.textContent = "Game Over! Play again?";
+  text.style.fontSize = "100px";
 
   const button = document.createElement("button");
   button.textContent = "Reset Game";
   button.style.padding = "10px 20px";
   button.style.marginTop = "10px";
   button.style.cursor = "pointer";
+  button.style.width = "400px";
+  button.style.fontSize = "50px"
 
   button.addEventListener("click", () => {
     popup.replaceChildren();
@@ -153,7 +198,7 @@ function update() {
           horizontalLanes[Math.floor(Math.random() * horizontalLanes.length)],
           speed,
           60,
-          30
+          30,
         );
         break;
 
@@ -163,7 +208,7 @@ function update() {
           horizontalLanes[Math.floor(Math.random() * horizontalLanes.length)],
           speed,
           60,
-          30
+          30,
         );
         break;
 
@@ -172,8 +217,8 @@ function update() {
           "Down",
           verticalLanes[Math.floor(Math.random() * verticalLanes.length)],
           speed,
+          60,
           30,
-          60
         );
         break;
 
@@ -182,8 +227,8 @@ function update() {
           "Up",
           verticalLanes[Math.floor(Math.random() * verticalLanes.length)],
           speed,
+          60,
           30,
-          60
         );
         break;
     }
@@ -239,8 +284,8 @@ function update() {
   ) {
     score++;
     const newCoinPos = getNewCoinPos();
-    coin.x = newCoinPos.x;//Math.random() * canvas.width;
-    coin.y = newCoinPos.y//220 + Math.random() * canvas.height;
+    coin.x = newCoinPos.x; //Math.random() * canvas.width;
+    coin.y = newCoinPos.y; //220 + Math.random() * canvas.height;
   }
 
   chicken.step += 0.1;
@@ -248,17 +293,82 @@ function update() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#9DBE66";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#9DAC3A"
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  for (const hous of houses) {
+    ctx.drawImage(document.getElementById("house"), hous.x, hous.y, 520, 520);
+  }
 
-  // streets
   ctx.fillStyle = "#333";
   ctx.fillRect(0, 200, canvas.width, 100); // horizont high
   ctx.fillRect(0, 800, canvas.width, 100); // horizont low
   ctx.fillRect(canvas.width / 8 + 50, 0, 100, canvas.height); // vert right
   ctx.fillRect(canvas.width / 2 + 50, 0, 100, canvas.height); // vert mid
   ctx.fillRect(canvas.width - canvas.width / 8, 0, 100, canvas.height); // vert right
+
+  let trees = [
+    { x: 400, y: 10 },
+    { x: 70, y: 500 },
+    { x: 800, y: 0 },
+    { x: 1300, y: 10 },
+  ];
+
+  for (const tree of trees) {
+    ctx.drawImage(document.getElementById("tree"), tree.x, tree.y, 200, 200);
+  }
+
+  let wobble = Math.sin(chicken.step) * 3;
+
+  // Huhn
+  ctx.fillStyle = "yellow";
+  ctx.fillRect(chicken.x + wobble, chicken.y, chicken.size, chicken.size);
+
+  ctx.drawImage(
+    document.getElementById("chicken"),
+    chicken.x + wobble,
+    chicken.y,
+    chicken.width,
+    chicken.height,
+  );
+
+  // Auto
+  for (let car of cars) {
+    let carSprite = document.getElementById(String(car.color));
+    if (!carSprite) continue;
+
+    ctx.save();
+
+    ctx.translate(car.x + car.width / 2, car.y + car.height / 2);
+
+    switch (car.direction) {
+      case "Right":
+        ctx.rotate(0);
+        break;
+      case "Left":
+        ctx.rotate(Math.PI);
+        break;
+      case "Up":
+        ctx.rotate(-Math.PI / 2);
+        break;
+      case "Down":
+        ctx.rotate(Math.PI / 2);
+        break;
+    }
+
+    ctx.drawImage(
+      carSprite,
+      -car.width / 2,
+      -car.height / 2,
+      car.width,
+      car.height,
+    );
+
+    ctx.restore();
+  }
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(defaultCar.x, defaultCar.y, defaultCar.width, defaultCar.height);
 
   // Münze
   ctx.fillStyle = "gold";
@@ -273,44 +383,29 @@ function draw() {
   ctx.fill();
 
   ctx.drawImage(
-  document.getElementById("coin"),
-  coin.x,
-  coin.y,
-  coin.size,
-  coin.size
+    document.getElementById("coin"),
+    coin.x,
+    coin.y,
+    coin.size,
+    coin.size,
   );
-
-  let wobble = Math.sin(chicken.step) * 3;
-
-  // Huhn
-  ctx.fillStyle = "yellow";
-  ctx.fillRect(chicken.x + wobble, chicken.y, chicken.size, chicken.size);
-
-  ctx.drawImage(
-   document.getElementById("chicken"),
-  chicken.x + wobble,
-  chicken.y,
-  chicken.width ,
-  chicken.height
-  );
-
-  // Auto
-  for (let car of cars) {
-    ctx.fillStyle = "red";
-    ctx.fillRect(car.x, car.y, car.width, car.height);
-  }
-
-  ctx.fillStyle = "red";
-  ctx.fillRect(defaultCar.x, defaultCar.y, defaultCar.width, defaultCar.height);
 
   // Punkteanzeige
   ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText("Test: " + score, 10, 30);
+  ctx.font = "40px Arial";
+  ctx.fillText("Score: " + score, 15, 30);
+
+  if (tripMode) {
+    ctx.filter = `hue-rotate(${hue}deg)`;
+    ctx.drawImage(canvas, 0, 0);
+    hue++;
+    if (hue == 360) hue = 0;
+  }
 }
 
 function spawnCar(direction, yOrX, speed, width, height) {
   let x, y;
+  let color = getRandomInt(5);
 
   switch (
     direction // "goes to"
@@ -336,7 +431,7 @@ function spawnCar(direction, yOrX, speed, width, height) {
       break;
   }
 
-  cars.push(new Car(x, y, direction, speed, width, height));
+  cars.push(new Car(x, y, direction, speed, width, height, color));
 }
 
 function gameLoop() {
