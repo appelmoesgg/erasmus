@@ -310,6 +310,8 @@ function draw() {
   { x: 70, y: 500, width: 200, height: 200 },
   { x: 800, y: 0, width: 200, height: 200 },
   { x: 1300, y: 10, width: 200, height: 200 },
+  { x: 500, y: 900, width: 200, height: 200 },
+  { x: 1300, y: 900, width: 200, height: 200 },
 ];
 
   for (const tree of trees) {
