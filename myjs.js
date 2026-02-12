@@ -100,17 +100,19 @@ function handleMove(direction) {
       break;
   }
 
-  if (newX + chicken.width < 0 + chicken.width) {
-    newX = canvas.width - chicken.width + 10;
-  } else if (newX > canvas.width - chicken.width) {
-    newX = -chicken.width + 10;
-  }
+  WRAP_OFFSET = 10
+  if (chicken.x + chicken.width < 0) {
+  chicken.x = canvas.width - chicken.width - WRAP_OFFSET; // slightly inside right
+} else if (chicken.x > canvas.width) {
+  chicken.x = WRAP_OFFSET; // slightly inside left
+}
 
-  if (newY + chicken.height < 0) {
-    newY = canvas.height - chicken.height;
-  } else if (newY > canvas.height) {
-    newY = -chicken.height - 10;
-  }
+// Vertical wrap
+if (chicken.y + chicken.height < 0) {
+  chicken.y = canvas.height - chicken.height - WRAP_OFFSET; // slightly inside bottom
+} else if (chicken.y > canvas.height) {
+  chicken.y = WRAP_OFFSET; // slightly inside top
+}
 
   let hitsHouse = houses.some((house) =>
     collisionRect(
