@@ -9,10 +9,10 @@ let score = 0;
 
 // Huhn
 let chicken = {
-  x: canvas.width / 2 - 100, 
-  y: canvas.height / 2 - 95, 
-  width: 200,
-  height: 190,
+  x: canvas.width / 2 - 50, 
+  y: canvas.height / 2 - 47.5, 
+  width: 100,
+  height: 95,
   step: 0
 };
 
@@ -29,7 +29,7 @@ let defaultCar = {
 let coin = {
   x: Math.random() * 360,
   y: 230,
-  size: 20,
+  size: 40,
 };
 
 const horizontalLanes = [230, 830];
@@ -40,13 +40,18 @@ const verticalLanes = [
 ];
 
 function resetGame() {
-  chicken.x = 180;
-  chicken.y = 450;
+  chicken.x = canvas.width / 2 - 100;
+  chicken.y = canvas.height / 2 - 95;
   defaultCar.x = -60;
   score = 0;
+  cars = []
 }
 
 let popupShown = false;
+
+function getNewCoinPos(){ //todo randomisation (on road)
+  return {x: 500, y: 500}
+}
 
 function handleMove(direction) {
   const moves = ["Up", "Down", "Left", "Right"];
@@ -54,25 +59,21 @@ function handleMove(direction) {
 
   switch (num) {
     case 0:
-      console.log("up");
       if (chicken.y - 20 > 0) {
         chicken.y -= 20;
       }
       break;
     case 1:
-      console.log("down");
       if (chicken.y + 20 < canvas.height) {
         chicken.y += 20;
       }
       break;
     case 2:
-      console.log("left");
       if (chicken.x - 20 > 0) {
         chicken.x -= 20;
       }
       break;
     case 3:
-      console.log("right");
       if (chicken.x + 20 < canvas.width) {
         chicken.x += 20;
       }
@@ -98,12 +99,12 @@ function collisionRect(a, b) {
   );
 }
 
-function collisionCircleRect(circle, car) {
+function collisionCircleRect(chicken, circle) {
   return (
-    circle.x < car.x + car.width &&
-    circle.x + circle.size > car.x &&
-    circle.y < car.y + car.height &&
-    circle.y + circle.size > car.y
+    circle.x < chicken.x + chicken.width &&
+    circle.x + circle.size > chicken.x &&
+    circle.y < chicken.y + chicken.height &&
+    circle.y + circle.size > chicken.y
   );
 }
 
@@ -238,7 +239,7 @@ function update() {
   }
 
   if (
-    collisionCircleRect(chicken, {
+    collisionRect(chicken, {
       x: coin.x,
       y: coin.y,
       width: coin.size,
@@ -246,12 +247,9 @@ function update() {
     })
   ) {
     score++;
-    coin.x = Math.random() * canvas.width;
-    coin.y = 220 + Math.random() * canvas.height;
-  }
-
-  if (chicken.y < 0) {
-    resetGame();
+    const newCoinPos = getNewCoinPos();
+    coin.x = newCoinPos.x;//Math.random() * canvas.width;
+    coin.y = newCoinPos.y//220 + Math.random() * canvas.height;
   }
 
   chicken.step += 0.1;
@@ -259,6 +257,9 @@ function update() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#9DAC3A"
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   // streets
   ctx.fillStyle = "#333";
@@ -279,6 +280,14 @@ function draw() {
     Math.PI * 2,
   );
   ctx.fill();
+
+  ctx.drawImage(
+  document.getElementById("coin"),
+  coin.x,
+  coin.y,
+  coin.size,
+  coin.size
+  );
 
   let wobble = Math.sin(chicken.step) * 3;
 

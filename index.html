@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <title>Chicken Cross the Road</title>
@@ -19,21 +20,22 @@
     }
   </style>
 </head>
-<body>
-  <div class="hidden">
-  <img
-    hidden
-    id="chicken"
-    src="chicken.svg"
-    width="212"
-    height="150" />
-</div>
 
-<canvas id="game" width="1920" height="1080"></canvas>
-<div id="GameClosedPopUp">
-    
-</div>
+<body>
+  <div hidden>
+    <img id="chicken" src="chicken.svg" width="512" height="512" />
+    <img id="coin" src="coin.svg" width="512" height="512" />
+    <img id="tree" src="tree.svg" width="512" height="512" />
+    <img id="house" src="house.svg" width="512" height="512" />
+  </div>
+  </div>
+
+  <canvas id="game" width="1920" height="1080"></canvas>
+  <div id="GameClosedPopUp">
+
+  </div>
 
 </body>
 <script type="module" src="./myjs.js"></script>
+
 </html>
